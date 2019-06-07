@@ -19,6 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
 parser.add_argument('--model', default='model_rpointnet', help='Model name [default: model_rpointnet]')
 parser.add_argument('--log_dir', default='log', help='Log dir [default: log]')
+parser.add_argument('--train_module', default='SPN', help='The module to be trained [options: SPN or RPOINTNET]')
 parser.add_argument('--num_point', type=int, default=CONFIG.NUM_POINT, help='Point Number in a Scene [default: 18000]')
 parser.add_argument('--num_point_ins', type=int, default=CONFIG.NUM_POINT_INS, help='Point Number of an Instance [default: 512]')
 parser.add_argument('--num_category', type=int, default=CONFIG.NUM_CATEGORY, help='Maximum Number of Categories [default: 19]')
@@ -43,6 +44,7 @@ CONFIG.NUM_POINT = FLAGS.num_point
 CONFIG.NUM_POINT_INS = FLAGS.num_point_ins
 CONFIG.NUM_CATEGORY = FLAGS.num_category
 CONFIG.NUM_SAMPLE = FLAGS.num_sample
+CONFIG.TRAIN_MODULE = [FLAGS.train_module]
 MAX_EPOCH = FLAGS.max_epoch
 BASE_LEARNING_RATE = FLAGS.learning_rate
 GPU_INDEX = FLAGS.gpu
