@@ -39,8 +39,8 @@ def collect_label(labelPath, scan):
                 print('Error!')
             outGroups[ind] = objectId
 
-    semLabel = map(int, semLabel)
-    outGroups = map(int, outGroups)
+    semLabel = np.array(map(int, semLabel))
+    outGroups = np.array(map(int, outGroups))
     
     return semLabel, outGroups
 
@@ -53,17 +53,13 @@ if __name__ == '__main__':
     outPath = sys.argv[2]
     trainMeshPath = os.path.join(datasetPath, 'mesh/scans')
     trainLabelPath = os.path.join(datasetPath, 'label/scans')
-    testMeshPath = os.path.join(datasetPath, 'mesh/scans_test')
     trainList = os.listdir(trainMeshPath)
-    testList = os.listdir(testMeshPath)
 
     # Create output path
     if not os.path.exists(os.path.join(outPath, 'mesh/scans')):
         os.makedirs(os.path.join(outPath, 'mesh/scans'))
     if not os.path.exists(os.path.join(outPath, 'label/scans')):
         os.makedirs(os.path.join(outPath, 'label/scans'))
-    if not os.path.exists(os.path.join(outPath, 'mesh/scans_test')):
-        os.makedirs(os.path.join(outPath, 'mesh/scans_test'))
 
     # Downsample each scene and save the data to outPath
     nSample = 30000
@@ -77,8 +73,7 @@ if __name__ == '__main__':
     for i, scan in enumerate(trainList):
         scene = np.array(io_util.read_color_ply(os.path.join(trainMeshPath, scan, scan+'_vh_clean_2.ply')))
         sem_label, ins_label = collect_label(trainLabelPath, scan)
-
-        if np.shape(scene)[0] <= N:
+        if np.shape(scene)[0] <= nSample:
             output = scene
             out_sem = sem_label
             out_ins = ins_label
@@ -91,23 +86,8 @@ if __name__ == '__main__':
             out_sem = sem_label[idx]
             out_ins = ins_label[idx]
  
-        io_util.write_color_ply(output, os.path.join(outPath, 'mesh/scans', scan))
-        io_util.write_label_txt(out_sem, os.path.join(outPath, 'label/scans', scan))
-        io_util.write_label_txt(out_ins, os.path.join(outPath, 'label/scans', scan))
+        io_util.write_color_ply(output, os.path.join(outPath, 'mesh/scans', scan+'.ply'))
+        io_util.write_label_txt(out_sem, os.path.join(outPath, 'label/scans', 'sem_'+scan+'.txt'))
+        io_util.write_label_txt(out_ins, os.path.join(outPath, 'label/scans', 'group_'+scan+'.txt'))
         print('Scene ' + str(i) + ' done!')
-
-    for i, scan in enumerate(testList):
-        scene = np.array(io_util.read_color_ply(os.path.join(testMeshPath, scan, scan+'_vh_clean_2.ply')))
-
-        if np.shape(scene)[0] <= N:
-            output = scene
-        else:
-            xyz = scene[:,:3]
-            pc = np.expand_dims(xyz, axis=0)
-            idx = sess.run(ind, feed_dict={points: pc})
-            idx = idx[0,:]
-            output = scene[idx]
- 
-        io_util.write_color_ply(output, os.path.join(outPath, 'mesh/scans_test', scan))
-        print('Test scene ' + str(i) + ' done!')
 
