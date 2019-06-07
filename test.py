@@ -37,10 +37,11 @@ MODEL_PATH = FLAGS.model_path
 GPU_INDEX = FLAGS.gpu
 MODEL = importlib.import_module(FLAGS.model) # import network module
 
-SRC_DATA_PATH = os.path.join(ROOT_DIR, 'data/scannet_preprocessed')
+SRC_MESH_PATH = os.path.join(ROOT_DIR, 'data/scannet_preprocessed/mesh/scans')
+SRC_LABEL_PATH = os.path.join(ROOT_DIR, 'data/scannet_preprocessed/label/scans')
 VAL_LIST = os.path.join(ROOT_DIR, 'data/scannet/scannet_val.txt')
 VAL_CACHE = os.path.join(ROOT_DIR, 'data/cache/val_%d_%d.npz'%(CONFIG.NUM_POINT, CONFIG.NUM_POINT_INS))
-VAL_DATASET = dataset.ScanNetDataset(SRC_DATA_PATH, VAL_LIST, VAL_CACHE, npoint=CONFIG.NUM_POINT, npoint_ins=CONFIG.NUM_POINT_INS, is_augment=False, permute_points=False)
+VAL_DATASET = dataset.ScanNetDataset(SRC_MESH_PATH, SRC_LABEL_PATH, VAL_LIST, VAL_CACHE, npoint=CONFIG.NUM_POINT, npoint_ins=CONFIG.NUM_POINT_INS, is_augment=False, permute_points=False)
 CONFIG.NUM_GROUP = VAL_DATASET.ngroup
 
 def get_model(batch_size):

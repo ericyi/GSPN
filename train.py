@@ -69,13 +69,14 @@ BN_DECAY_CLIP = 0.99
 
 if not os.path.exists(os.path.join(ROOT_DIR, 'data/cache')):
     os.makedirs(os.path.join(ROOT_DIR, 'data/cache'))
-SRC_DATA_PATH = os.path.join(ROOT_DIR, 'data/scannet_preprocessed')
+SRC_MESH_PATH = os.path.join(ROOT_DIR, 'data/scannet_preprocessed/mesh/scans')
+SRC_LABEL_PATH = os.path.join(ROOT_DIR, 'data/scannet_preprocessed/label/scans')
 TRAIN_LIST = os.path.join(ROOT_DIR, 'data/scannet/scannet_train.txt')
 VAL_LIST = os.path.join(ROOT_DIR, 'data/scannet/scannet_val.txt')
 TRAIN_CACHE = os.path.join(ROOT_DIR, 'data/cache/train_%d_%d.npz'%(CONFIG.NUM_POINT, CONFIG.NUM_POINT_INS))
 VAL_CACHE = os.path.join(ROOT_DIR, 'data/cache/val_%d_%d.npz'%(CONFIG.NUM_POINT, CONFIG.NUM_POINT_INS))
-TRAIN_DATASET = dataset.ScanNetDataset(SRC_DATA_PATH, TRAIN_LIST, TRAIN_CACHE, npoint=CONFIG.NUM_POINT, npoint_ins=CONFIG.NUM_POINT_INS, is_augment=IS_AUGMENT)
-VAL_DATASET = dataset.ScanNetDataset(SRC_DATA_PATH, VAL_LIST, VAL_CACHE, npoint=CONFIG.NUM_POINT, npoint_ins=CONFIG.NUM_POINT_INS, is_augment=False, permute_points=False)
+TRAIN_DATASET = dataset.ScanNetDataset(SRC_MESH_PATH, SRC_LABEL_PATH, TRAIN_LIST, TRAIN_CACHE, npoint=CONFIG.NUM_POINT, npoint_ins=CONFIG.NUM_POINT_INS, is_augment=IS_AUGMENT)
+VAL_DATASET = dataset.ScanNetDataset(SRC_MESH_PATH, SRC_LABEL_PATH, VAL_LIST, VAL_CACHE, npoint=CONFIG.NUM_POINT, npoint_ins=CONFIG.NUM_POINT_INS, is_augment=False, permute_points=False)
 
 CONFIG.NUM_GROUP = np.maximum(TRAIN_DATASET.ngroup, VAL_DATASET.ngroup)
 TRAIN_DATASET.ngroup = CONFIG.NUM_GROUP
