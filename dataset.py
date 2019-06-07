@@ -11,9 +11,10 @@ import numpy as np
 import scipy.io as sio
 
 class ScanNetDataset():
-    def __init__(self, src_data_path, list_path, cache_path, npoint=18000, npoint_ins=512, is_augment=False, permute_points=True):
+    def __init__(self, src_mesh_path, src_label_path, list_path, cache_path, npoint=18000, npoint_ins=512, is_augment=False, permute_points=True):
         '''
-            src_data_path: path to ScanNet
+            src_mesh_path: path to ScanNet mesh
+            src_label_path: path to ScanNet label
             list_path: a plain txt file containing all the file names
             cache_path: path to the cached files
             npoint: number of sampled points per scene
@@ -32,9 +33,9 @@ class ScanNetDataset():
             #### collect the number of instances per scene
             self.ngroup = np.load(cache_path)['ngroup'].item()
         else:
-            self.cache_file(src_data_path, cache_path)
+            self.cache_file(src_mesh_path, src_label_path, cache_path)
 
-    def cache_file(self, src_data_path, cache_path):
+    def cache_file(self, src_mesh_path, src_label_path, cache_path):
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         with tf.device('/gpu:0'):
@@ -55,11 +56,11 @@ class ScanNetDataset():
                 target_sem_idx[i] = 0
         for index in range(nfile):
             print(np.float32(index)/nfile)
-            curpc_color = io_util.read_color_ply(os.path.join(src_data_path, 'mesh2', self.file_list[index]+'.ply'))
+            curpc_color = io_util.read_color_ply(os.path.join(src_mesh_path, self.file_list[index]+'.ply'))
             curpc = curpc_color[:,:3].astype(np.float32)
             curcolor = curpc_color[:,3:].astype(np.float32)/255.0
-            curgroup = io_util.read_label_txt(os.path.join(src_data_path, 'label2', 'group_'+self.file_list[index]+'.txt')).astype(np.int32)
-            curseg = io_util.read_label_txt(os.path.join(src_data_path, 'label2', 'sem_'+self.file_list[index]+'.txt')).astype(np.int32)
+            curgroup = io_util.read_label_txt(os.path.join(src_label_path, 'group_'+self.file_list[index]+'.txt')).astype(np.int32)
+            curseg = io_util.read_label_txt(os.path.join(src_label_path, 'sem_'+self.file_list[index]+'.txt')).astype(np.int32)
             curseg[curseg>=40] = 0
             curseg[curseg<0] = 0
             curseg = self.changem(curseg, np.arange(40), target_sem_idx)
@@ -197,14 +198,15 @@ if __name__ == '__main__':
     npoint_ins = 512 # number of sampled points per instance
     if not os.path.exists(os.path.join(BASE_DIR, 'data/cache')):
         os.makedirs(os.path.join(BASE_DIR, 'data/cache'))
-    src_data_path = os.path.join(BASE_DIR, 'data/scannet_preprocessed')
+    src_mesh_path = os.path.join(BASE_DIR, 'data/scannet_preprocessed/mesh/scans')
+    src_label_path = os.path.join(BASE_DIR, 'data/scannet_preprocessed/label/scans')
     train_list = os.path.join(BASE_DIR, 'data/scannet/scannet_train.txt')
     val_list = os.path.join(BASE_DIR, 'data/scannet/scannet_val.txt')
     train_cache = os.path.join(BASE_DIR, 'data/cache/train_%d_%d.npz'%(npoint, npoint_ins))
     val_cache = os.path.join(BASE_DIR, 'data/cache/val_%d_%d.npz'%(npoint, npoint_ins))
-    trainDataset = ScanNetDataset(src_data_path, train_list, train_cache, npoint=npoint, npoint_ins=npoint_ins, is_augment=True)
+    trainDataset = ScanNetDataset(src_mesh_path, src_label_path, train_list, train_cache, npoint=npoint, npoint_ins=npoint_ins, is_augment=True)
     print(len(trainDataset))
     pc, color, pc_ins_full, group_label, group_indicator, seg_label, bbox_ins_full = trainDataset[0]
-    valDataset = ScanNetDataset(src_data_path, val_list, val_cache, npoint=npoint, npoint_ins=npoint_ins, is_augment=False)
+    valDataset = ScanNetDataset(src_mesh_path, src_label_path, val_list, val_cache, npoint=npoint, npoint_ins=npoint_ins, is_augment=False)
     print(len(valDataset))
     pc_val, color_val, pc_ins_full_val, group_label_val, group_indicator_val, seg_label_val, bbox_ins_full_val = valDataset[0]
