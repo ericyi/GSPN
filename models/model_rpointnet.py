@@ -126,7 +126,7 @@ def shift_pred_net(xyz, points, npoint_seed, end_points, scope, is_training, bn_
 
         return end_points
 
-def sem_net(xyz, points, npoint_sem, num_category, ind_seed, end_points, scope, is_training, bn_decay=None, return_fullfea=False):
+def sem_net(xyz, points, npoint_sem, num_category, ind_seed, end_points, scope, is_training, bn_decay=None, return_fullfea=False, mode='training'):
     ''' Encode multiple context.
         Input:
             xyz: (batch_size, ndataset, 3) TF tensor
@@ -195,8 +195,10 @@ def sem_net(xyz, points, npoint_sem, num_category, ind_seed, end_points, scope, 
             end_points['sem_fea_seed'] = sem_fea_seed
             end_points['sem_fea'] = sem_fea
 
-        # net = end_points['sem_fea_full']
-        net = end_points['sem_fea']
+        if mode=='training':
+            net = end_points['sem_fea']
+        elif mode=='inference':
+            net = end_points['sem_fea_full']
         net = tf_util.dropout(net, keep_prob=0.5, is_training=is_training, scope='dp1')
         sem_class_logits = tf_util.conv1d(net, num_category, 1, padding='VALID', activation_fn=None, scope='fc2')
         end_points['sem_class_logits'] = sem_class_logits
@@ -319,7 +321,7 @@ def decoding_net(feat, num_point, scope, is_training, bn_decay):
         pc = tf.reshape(pc, [-1, nsmp, num_point, 3])
         return pc
 
-def shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, num_category, scope, is_training, bn_decay=None, nsmp=128, return_fullfea=False):
+def shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, num_category, scope, is_training, bn_decay=None, nsmp=128, return_fullfea=False, mode='training'):
     ''' Shape proposal generation
     Inputs:
         pc: [B, NUM_POINT, 3]
@@ -349,7 +351,7 @@ def shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, num_cate
         shift_pred_seed = tf.multiply(shift_pred_seed_4d[:,:,:3], shift_pred_seed_4d[:,:,3:])
 
         # Semantic prediction, sem_fea_seed [B, nsmp, nfea]
-        end_points = sem_net(pc, color, 1024, num_category, ind_seed, end_points, 'sem_predictor', is_training, bn_decay=bn_decay, return_fullfea=return_fullfea)
+        end_points = sem_net(pc, color, 1024, num_category, ind_seed, end_points, 'sem_predictor', is_training, bn_decay=bn_decay, return_fullfea=return_fullfea, mode=mode)
         sem_fea_seed = end_points['sem_fea_seed']
 
         # Encode instance, pcfea_ins_centered [B, ngroup, nfea_ins], pc_ins_center [B, ngroup, 1, 3]
@@ -1063,9 +1065,9 @@ def rpointnet(pc, color, pc_ins, group_label, group_indicator, seg_label, bbox_i
     if not config.USE_COLOR:
         color = None
     if 'SPN' in config.TRAIN_MODULE and mode=='training':
-        end_points = shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, config.NUM_CATEGORY, scope='shape_proposal_net', is_training=is_training, bn_decay=bn_decay, nsmp=config.NUM_SAMPLE, return_fullfea=False)
+        end_points = shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, config.NUM_CATEGORY, scope='shape_proposal_net', is_training=is_training, bn_decay=bn_decay, nsmp=config.NUM_SAMPLE, return_fullfea=False, mode=mode)
     else:
-        end_points = shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, config.NUM_CATEGORY, scope='shape_proposal_net', is_training=tf.constant(False), bn_decay=None, nsmp=config.NUM_SAMPLE, return_fullfea=True)
+        end_points = shape_proposal_net(pc, color, pc_ins, group_label, group_indicator, config.NUM_CATEGORY, scope='shape_proposal_net', is_training=tf.constant(False), bn_decay=None, nsmp=config.NUM_SAMPLE, return_fullfea=True, mode=mode)
         end_points = dict_stop_gradient(end_points)
     if config.SHRINK_BOX:
         end_points['bbox_ins_pred'] = box_shrink(end_points['bbox_ins_pred'], pc)
