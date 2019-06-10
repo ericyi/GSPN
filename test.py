@@ -207,7 +207,7 @@ def output_prediction(sess, ops, dataset, scan_list_path, output_path):
 
 
 if __name__=='__main__':
-    OUT_PATH = sys.path.append(os.path.join(ROOT_DIR, 'eva'))
+    OUT_PATH = os.path.join(ROOT_DIR, 'eva')
     if not os.path.exists(OUT_PATH):
         os.makedirs(OUT_PATH)
     BATCH_SIZE = 1
