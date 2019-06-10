@@ -1,6 +1,0 @@
-[submodule "ScanNet"]
-	path = ScanNet
-	url = https://github.com/ScanNet/ScanNet
-[submodule "external/ScanNet"]
-	path = external/ScanNet
-	url = https://github.com/ScanNet/ScanNet
