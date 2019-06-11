@@ -52,6 +52,7 @@ class Config(object):
             SPN_NMS_MAX_SIZE_INFERENCE = 384 # training - 96, test - 384 
             NUM_POINT_INS_MASK = 1024 # training - 256, test - 1024
             TRAIN_ROIS_PER_IMAGE = 512 # training - 64, test - 512 
+            DETECTION_MIN_CONFIDENCE = 0.5
 
 
     def display(self):
