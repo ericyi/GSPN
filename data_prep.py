@@ -46,8 +46,8 @@ def collect_label(labelPath, scan):
 
 
 if __name__ == '__main__':
-    #### datasetPath: ./scannet
-    #### outPath: ./scannet_preprocessed
+    #### datasetPath: ./data/scannet
+    #### outPath: ./data/scannet_preprocessed
     assert len(sys.argv)==3, 'Incorrect Number of Arguments'
     datasetPath = sys.argv[1]
     outPath = sys.argv[2]
