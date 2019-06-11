@@ -17,7 +17,7 @@ This work is based on our CVPR'19 paper. You can find arXiv version of the paper
 In this repository we release code and pre-trained model for both GSPN and R-PointNet.
 
 ### Usage
-We provide a step-by-step usage instruction from data processing to network evaluation on the <a href="http://www.scan-net.org/">ScanNet</a> dataset. Please download ScanNet data and store in data folder first. 
+We provide a step-by-step usage instruction from data processing to network evaluation on the <a href="http://www.scan-net.org/">ScanNet</a> dataset. Please download ScanNet data and store in the "data" folder first. 
 
 1. Compiling the TF operators
 
