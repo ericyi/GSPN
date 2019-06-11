@@ -592,7 +592,7 @@ def sample_points_within_box(masks, nsmp):
     if masks.shape[0]==0:
         return np.zeros((0, nsmp), dtype=np.int32)
     else:
-        masks_selection_idx = [np.random.choice(np.where(masks[i,:])[0], nsmp, replace=True) for i in np.arange(masks.shape[0])]
+        masks_selection_idx = [np.random.choice(np.where(masks[i,:])[0], nsmp, replace=True) if len(np.where(masks[i,:])[0])>0 else np.zeros(nsmp, dtype=np.int32) for i in np.arange(masks.shape[0])]
         masks_selection_idx = np.stack(masks_selection_idx, 0).astype(np.int32)
         return masks_selection_idx
 
