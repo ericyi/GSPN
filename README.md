@@ -17,7 +17,7 @@ This work is based on our CVPR'19 paper. You can find arXiv version of the paper
 In this repository we release code and pre-trained model for both GSPN and R-PointNet.
 
 ### Usage
-We provide a step-by-step usage instruction from data processing to network evaluation on the <a href="http://www.scan-net.org/">ScanNet</a> dataset.
+We provide a step-by-step usage instruction from data processing to network evaluation on the <a href="http://www.scan-net.org/">ScanNet</a> dataset. Please download ScanNet data and store in data folder first. 
 
 1. Compiling the TF operators
 
@@ -26,7 +26,7 @@ We provide a step-by-step usage instruction from data processing to network eval
         
 2. Data pre-processing: convert ScanNet into downsampled point cloud for fast training and evaluation
 
-        python data_prep.py
+        python data_prep.py ./data/scannet ./data/scannet_preprocessed
         python dataset.py
         
 3. Two-step training: we train GSPN and R-PointNet separately in two different stages
